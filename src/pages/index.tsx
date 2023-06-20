@@ -1,6 +1,8 @@
 import { type NextPage } from "next";
-import { signIn, signOut, useSession } from "next-auth/react";
+//import { signIn, signOut, useSession } from "next-auth/react";
 import { NewTweetForm } from "../components/NewTweetForm";
+import InfiniteTweetList from "../components/InfiniteTweetList";
+import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
   return (
@@ -9,8 +11,27 @@ const Home: NextPage = () => {
         <h1 className="mb-2 px-4 text-lg font-bold">Twitter Clone</h1>
       </header>
       <NewTweetForm />
+      <RecentTweets />
     </>
   );
 };
+
+function RecentTweets() {
+  const tweets = api.tweet.infiniteFeed.useInfiniteQuery(
+    {},
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    }
+  );
+  return (
+    <InfiniteTweetList
+      tweets={tweets.data?.pages.flatMap((page) => page.tweets)}
+      isError={tweets.isError}
+      isLoading={tweets.isLoading}
+      hasMore={tweets.hasNextPage ?? false}
+      fetchNewTweets={tweets.fetchNextPage}
+    />
+  );
+}
 
 export default Home;
