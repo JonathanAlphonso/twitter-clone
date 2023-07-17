@@ -20,6 +20,7 @@ export const tweetRouter = createTRPCRouter({
       })
     )
     .query(async ({ input: { userId, limit = 10, cursor }, ctx }) => {
+      // eslint-disable-next-line
       const currentUserId = ctx.session?.user.id;
       return await getInfiniteTweets({
         limit,
@@ -129,7 +130,7 @@ async function getInfiniteTweets({
   let nextCursor: typeof cursor | undefined;
 
   if (data.length > limit) {
-    let nextItem = data.pop();
+    const nextItem = data.pop();
     if (nextItem != null) {
       nextCursor = {
         id: nextItem.id,
