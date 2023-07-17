@@ -1,13 +1,14 @@
-import { Prisma } from "@prisma/client";
-import { inferAsyncReturnType } from "@trpc/server";
+import type { Prisma } from "@prisma/client"; // Only used as types, so use import type.
+import type { inferAsyncReturnType } from "@trpc/server"; // Only used as types, so use import type.
 import { z } from "zod";
 
 import {
   createTRPCRouter,
   publicProcedure,
   protectedProcedure,
-  createTRPCContext,
 } from "~/server/api/trpc";
+
+import type { createTRPCContext } from "~/server/api/trpc"; // Only used as types, so use import type.
 
 export const tweetRouter = createTRPCRouter({
   infiniteProfileFeed: publicProcedure

@@ -14,7 +14,6 @@ import { VscArrowLeft } from "react-icons/vsc";
 import { useSession } from "next-auth/react";
 import { ProfileImage } from "~/components/ProfileImage";
 import InfiniteTweetList from "~/components/InfiniteTweetList";
-import { use } from "react";
 import { Button } from "~/components/Button";
 
 const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
