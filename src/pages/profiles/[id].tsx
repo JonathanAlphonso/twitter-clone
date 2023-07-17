@@ -11,9 +11,9 @@ import ErrorPage from "next/error";
 import Link from "next/link";
 import { IconHoverEffect } from "~/components/IconHoverEffect";
 import { VscArrowLeft } from "react-icons/vsc";
-import { useSession } from "next-auth/react";
 import { ProfileImage } from "~/components/ProfileImage";
-import InfiniteTweetList from "~/components/InfiniteTweetList";
+import { InfiniteTweetList } from "~/components/InfiniteTweetList";
+import { useSession } from "next-auth/react";
 import { Button } from "~/components/Button";
 
 const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
@@ -29,6 +29,7 @@ const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
     onSuccess: ({ addedFollow }) => {
       trpcUtils.profile.getById.setData({ id }, (oldData) => {
         if (oldData == null) return;
+
         const countModifier = addedFollow ? 1 : -1;
         return {
           ...oldData,
@@ -42,10 +43,11 @@ const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
   if (profile == null || profile.name == null) {
     return <ErrorPage statusCode={404} />;
   }
+
   return (
     <>
       <Head>
-        <title>{`Twitter Clone ${profile.name}`}</title>
+        <title>{`Twitter Clone - ${profile.name}`}</title>
       </Head>
       <header className="sticky top-0 z-10 flex items-center border-b bg-white px-4 py-2">
         <Link href=".." className="mr-2">
@@ -76,7 +78,7 @@ const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
           tweets={tweets.data?.pages.flatMap((page) => page.tweets)}
           isError={tweets.isError}
           isLoading={tweets.isLoading}
-          hasMore={tweets.hasNextPage ?? false}
+          hasMore={tweets.hasNextPage}
           fetchNewTweets={tweets.fetchNextPage}
         />
       </main>
@@ -96,13 +98,14 @@ function FollowButton({
   onClick: () => void;
 }) {
   const session = useSession();
+
   if (session.status !== "authenticated" || session.data.user.id === userId) {
     return null;
   }
 
   return (
     <Button disabled={isLoading} onClick={onClick} small gray={isFollowing}>
-      {isFollowing ? "UnFollow" : "Follow"}
+      {isFollowing ? "Unfollow" : "Follow"}
     </Button>
   );
 }
@@ -123,6 +126,7 @@ export async function getStaticProps(
   context: GetStaticPropsContext<{ id: string }>
 ) {
   const id = context.params?.id;
+
   if (id == null) {
     return {
       redirect: {
@@ -130,13 +134,14 @@ export async function getStaticProps(
       },
     };
   }
+
   const ssg = ssgHelper();
   await ssg.profile.getById.prefetch({ id });
 
   return {
     props: {
-      id,
       trpcState: ssg.dehydrate(),
+      id,
     },
   };
 }
