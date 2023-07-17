@@ -1,18 +1,25 @@
-import Button from "./Button";
-import ProfileImage from "./ProfileImage";
 import { useSession } from "next-auth/react";
-import { useLayoutEffect, useState, useRef, useCallback } from "react";
+import {
+  FormEvent,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { api } from "~/utils/api";
+import { Button } from "./Button";
+import { ProfileImage } from "./ProfileImage";
 
-function updateTextAreaSize(textarea: HTMLTextAreaElement) {
-  if (textarea == null) return;
-  textarea.style.height = "0";
-  textarea.style.height = `${textarea.scrollHeight}px`;
+function updateTextAreaSize(textArea?: HTMLTextAreaElement) {
+  if (textArea == null) return;
+  textArea.style.height = "0";
+  textArea.style.height = `${textArea.scrollHeight}px`;
 }
 
 export function NewTweetForm() {
   const session = useSession();
   if (session.status !== "authenticated") return null;
+
   return <Form />;
 }
 
@@ -27,16 +34,18 @@ function Form() {
   const trpcUtils = api.useContext();
 
   useLayoutEffect(() => {
-    updateTextAreaSize(textAreaRef.current!);
+    updateTextAreaSize(textAreaRef.current);
   }, [inputValue]);
 
   const createTweet = api.tweet.create.useMutation({
     onSuccess: (newTweet) => {
-      console.log("tweet created");
       setInputValue("");
+
       if (session.status !== "authenticated") return;
+
       trpcUtils.tweet.infiniteFeed.setInfiniteData({}, (oldData) => {
         if (oldData == null || oldData.pages[0] == null) return;
+
         const newCacheTweet = {
           ...newTweet,
           likeCount: 0,
@@ -64,8 +73,9 @@ function Form() {
 
   if (session.status !== "authenticated") return null;
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: FormEvent) {
     e.preventDefault();
+
     createTweet.mutate({ content: inputValue });
   }
 

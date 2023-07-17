@@ -1,11 +1,9 @@
 import { type NextPage } from "next";
-//import { signIn, signOut, useSession } from "next-auth/react";
 import { NewTweetForm } from "../components/NewTweetForm";
 import InfiniteTweetList from "../components/InfiniteTweetList";
 import { api } from "~/utils/api";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { set } from "zod";
 const TABS = ["Recent", "Following"] as const;
 
 const Home: NextPage = () => {

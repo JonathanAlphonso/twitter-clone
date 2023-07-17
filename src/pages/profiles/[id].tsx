@@ -12,10 +12,10 @@ import Link from "next/link";
 import { IconHoverEffect } from "~/components/IconHoverEffect";
 import { VscArrowLeft } from "react-icons/vsc";
 import { useSession } from "next-auth/react";
-import ProfileImage from "~/components/ProfileImage";
+import { ProfileImage } from "~/components/ProfileImage";
 import InfiniteTweetList from "~/components/InfiniteTweetList";
 import { use } from "react";
-import Button from "~/components/Button";
+import { Button } from "~/components/Button";
 
 const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
   id,
@@ -113,7 +113,7 @@ function getPlural(number: number, singular: string, plural: string) {
   return pluralRules.select(number) === "one" ? singular : plural;
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
+export const getStaticPaths: GetStaticPaths = () => {
   return {
     paths: [],
     fallback: "blocking",
