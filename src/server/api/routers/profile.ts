@@ -1,12 +1,11 @@
-//import { Prisma } from "@prisma/client";
-//import { inferAsyncReturnType } from "@trpc/server";
+// import { Prisma } from "@prisma/client";
+// import { inferAsyncReturnType } from "@trpc/server";
 import { z } from "zod";
 
 import {
   createTRPCRouter,
   publicProcedure,
   protectedProcedure,
-  // createTRPCContext,
 } from "~/server/api/trpc";
 
 export const profileRouter = createTRPCRouter({
@@ -23,14 +22,12 @@ export const profileRouter = createTRPCRouter({
           followers:
             currentUserId == null
               ? undefined
-              : {
-                  where: { id: currentUserId },
-                },
+              : { where: { id: currentUserId } },
         },
       });
-      if (profile == null) {
-        throw new Error("Profile not found");
-      }
+
+      if (profile == null) return;
+
       return {
         name: profile.name,
         image: profile.image,
@@ -43,7 +40,7 @@ export const profileRouter = createTRPCRouter({
   toggleFollow: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ input: { userId }, ctx }) => {
-      const currentUserId = ctx.session?.user.id;
+      const currentUserId = ctx.session.user.id;
       const existingFollow = await ctx.prisma.user.findFirst({
         where: { id: userId, followers: { some: { id: currentUserId } } },
       });
@@ -62,9 +59,10 @@ export const profileRouter = createTRPCRouter({
         });
         addedFollow = false;
       }
-      void ctx.revalidateSSG?.(`/profile/${userId}`);
-      void ctx.revalidateSSG?.(`/profile/${currentUserId}`);
-      //Revalidate the session
+
+      void ctx.revalidateSSG?.(`/profiles/${userId}`);
+      void ctx.revalidateSSG?.(`/profiles/${currentUserId}`);
+
       return { addedFollow };
     }),
 });
